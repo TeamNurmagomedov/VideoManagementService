@@ -23,8 +23,7 @@ public class VidoeModel {
     public VidoeModel() {
     }
 
-    public VidoeModel(String id, String path, String userId) {
-        Id = id;
+    public VidoeModel(String path, String userId) {
         Path = path;
         UserId = userId;
     }
