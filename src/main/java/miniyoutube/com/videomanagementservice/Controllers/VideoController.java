@@ -1,5 +1,6 @@
 package miniyoutube.com.videomanagementservice.Controllers;
 
+import miniyoutube.com.videomanagementservice.DTO.ComentDto;
 import miniyoutube.com.videomanagementservice.Services.FileService;
 import miniyoutube.com.videomanagementservice.Services.GetVideoI;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +36,27 @@ public class VideoController {
 
 
         String publicURL = getVideoI.GetVideo(id);
+        Map<String,String> response = new HashMap<>();
+        response.put("PublicURL",publicURL);
+        return new ResponseEntity<Map<String,String>>(response,HttpStatus.CREATED);
+    }
+    @PostMapping("/file/LikeVideo")
+    public ResponseEntity<Map<String,String>> LikeVideo(@RequestParam("id") String id) {
+        String publicURL = getVideoI.likeVideo(id);
+        Map<String,String> response = new HashMap<>();
+        response.put("PublicURL",publicURL);
+        return new ResponseEntity<Map<String,String>>(response,HttpStatus.CREATED);
+    }
+    @PostMapping("/file/DisLikeVideo")
+    public ResponseEntity<Map<String,String>> DisLikeVideo(@RequestParam("id") String id) {
+        String publicURL = getVideoI.DislikeVideo(id);
+        Map<String,String> response = new HashMap<>();
+        response.put("PublicURL",publicURL);
+        return new ResponseEntity<Map<String,String>>(response,HttpStatus.CREATED);
+    }
+    @PostMapping("/file/CommentVideo")
+    public ResponseEntity<Map<String,String>> DisLikeVideo(@RequestBody ComentDto comentDto) {
+        String publicURL = getVideoI.Coment(comentDto);
         Map<String,String> response = new HashMap<>();
         response.put("PublicURL",publicURL);
         return new ResponseEntity<Map<String,String>>(response,HttpStatus.CREATED);
