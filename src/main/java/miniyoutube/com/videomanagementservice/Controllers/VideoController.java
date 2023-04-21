@@ -41,15 +41,15 @@ public class VideoController {
         return new ResponseEntity<Map<String,String>>(response,HttpStatus.CREATED);
     }
     @PostMapping("/file/LikeVideo")
-    public ResponseEntity<Map<String,String>> LikeVideo(@RequestParam("id") String id) {
-        String publicURL = getVideoI.likeVideo(id);
+    public ResponseEntity<Map<String,String>> LikeVideo(@RequestParam("id") String id,@RequestParam("userId") String uid) {
+        String publicURL = getVideoI.likeVideo(id,uid);
         Map<String,String> response = new HashMap<>();
         response.put("PublicURL",publicURL);
         return new ResponseEntity<Map<String,String>>(response,HttpStatus.CREATED);
     }
     @PostMapping("/file/DisLikeVideo")
-    public ResponseEntity<Map<String,String>> DisLikeVideo(@RequestParam("id") String id) {
-        String publicURL = getVideoI.DislikeVideo(id);
+    public ResponseEntity<Map<String,String>> DisLikeVideo(@RequestParam("id") String id,@RequestParam("userId") String uid) {
+        String publicURL = getVideoI.DislikeVideo(id,uid);
         Map<String,String> response = new HashMap<>();
         response.put("PublicURL",publicURL);
         return new ResponseEntity<Map<String,String>>(response,HttpStatus.CREATED);
