@@ -1,5 +1,6 @@
 package miniyoutube.com.videomanagementservice.Services;
 
+import miniyoutube.com.videomanagementservice.Config.WebClientConfig;
 import miniyoutube.com.videomanagementservice.DTO.ComentDto;
 import miniyoutube.com.videomanagementservice.Models.ComentModel;
 import miniyoutube.com.videomanagementservice.Models.DisLikeModel;
@@ -24,23 +25,46 @@ public class GetVideoService implements GetVideoI {
     private DisLikeRepository disLikeRepository;
     @Autowired
     private CommentRepository commentRepository;
-
+    @Autowired
+    private WebClientConfig webClientConfig;
+    public String returnUserName(String id){
+        String userName= webClientConfig.webClient()
+                .get()
+                .uri("http://localhost:9092/user/email?id="+id)
+                .retrieve()
+                .bodyToMono(String.class)
+                .block();
+        return userName;
+    }
+    public String returnUserEmail(String id){
+        String userEmail= webClientConfig.webClient()
+                .get()
+                .uri("http://localhost:9092/user/email?id="+id)
+                .retrieve()
+                .bodyToMono(String.class)
+                .block();
+        return userEmail;
+    }
     @Override
-    public String GetVideo(String videoId) {
-
+    public String GetVideo(String videoId ) {
         VidoeModel video = videoRepository.getById(videoId);
         return video.getPath();
     }
 
     @Override
-    public String likeVideo(String videoId) {
+    public String likeVideo(String videoId,String id ) {
+        String name = returnUserName(id);
+        String email = returnUserEmail(id);
+        System.out.println(name);
         LikeModel like = new LikeModel(videoId);
         likeRepository.save(like);
         return "it is saved";
     }
 
     @Override
-    public String DislikeVideo(String videoId) {
+    public String DislikeVideo(String videoId,String id) {
+        String name = returnUserName(id);
+        String email = returnUserEmail(id);
         DisLikeModel like = new DisLikeModel(videoId);
         disLikeRepository.save(like);
         return "it is saved";
@@ -49,6 +73,8 @@ public class GetVideoService implements GetVideoI {
 
     @Override
     public String Coment(ComentDto comentDto) {
+        String name = returnUserName(comentDto.id);
+        String email = returnUserEmail(comentDto.id);
         ComentModel comment = new ComentModel(comentDto.videoId, comentDto.comment);
         commentRepository.save(comment);
         return "it is saved";
