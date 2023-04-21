@@ -11,7 +11,7 @@ import miniyoutube.com.videomanagementservice.Repositorys.DisLikeRepository;
 import miniyoutube.com.videomanagementservice.Repositorys.LikeRepository;
 import miniyoutube.com.videomanagementservice.Repositorys.VideoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.orm.hibernate5.HibernateTemplate;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -27,10 +27,17 @@ public class GetVideoService implements GetVideoI {
     private CommentRepository commentRepository;
     @Autowired
     private WebClientConfig webClientConfig;
+
+    private final KafkaTemplate<String, String> kafkaTemplate;
+
+    public GetVideoService(KafkaTemplate<String, String> kafkaTemplate) {
+        this.kafkaTemplate = kafkaTemplate;
+    }
+
     public String returnUserName(String id){
         String userName= webClientConfig.webClient()
                 .get()
-                .uri("http://localhost:9092/user/email?id="+id)
+                .uri("http://localhost:9095/user/email?id="+id)
                 .retrieve()
                 .bodyToMono(String.class)
                 .block();
@@ -39,7 +46,7 @@ public class GetVideoService implements GetVideoI {
     public String returnUserEmail(String id){
         String userEmail= webClientConfig.webClient()
                 .get()
-                .uri("http://localhost:9092/user/email?id="+id)
+                .uri("http://localhost:9095/user/email?id="+id)
                 .retrieve()
                 .bodyToMono(String.class)
                 .block();
@@ -56,6 +63,7 @@ public class GetVideoService implements GetVideoI {
         String name = returnUserName(id);
         String email = returnUserEmail(id);
         System.out.println(name);
+        kafkaTemplate.send("events-topic", "Like/ " + videoId + "/" +  name + "/" + email);
         LikeModel like = new LikeModel(videoId);
         likeRepository.save(like);
         return "it is saved";
@@ -66,6 +74,7 @@ public class GetVideoService implements GetVideoI {
         String name = returnUserName(id);
         String email = returnUserEmail(id);
         DisLikeModel like = new DisLikeModel(videoId);
+        kafkaTemplate.send("events-topic", "Dislike/ " + videoId + "/" +  name + "/" + email);
         disLikeRepository.save(like);
         return "it is saved";
 
@@ -76,6 +85,7 @@ public class GetVideoService implements GetVideoI {
         String name = returnUserName(comentDto.id);
         String email = returnUserEmail(comentDto.id);
         ComentModel comment = new ComentModel(comentDto.videoId, comentDto.comment);
+        kafkaTemplate.send("events-topic", "Comment/ " + comentDto.videoId + "/" +  name + "/" + email + "/" + comentDto.comment);
         commentRepository.save(comment);
         return "it is saved";
     }
